@@ -8,7 +8,7 @@ pipelines:
           deployment: Staging
           script:
             - npm install && npm run build:dist
-            - cd $BITBUCKET_CLONE_DIR && sh setup-perms.sh
+            - cd $BITBUCKET_CLONE_DIR/dist && sh setup-perms.sh
             - pipe: atlassian/rsync-deploy:0.4.3
               variables:
                 USER: $DEPLOY_USER
