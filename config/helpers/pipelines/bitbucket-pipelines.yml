@@ -1,0 +1,20 @@
+image: node:12.15
+
+pipelines:
+  custom:
+    deployment-to-stage:
+      - step:
+          name: Deployment to dev.they.net
+          deployment: Staging
+          script:
+            - npm install && npm run build:dist
+            - cd $BITBUCKET_CLONE_DIR && sh setup-perms.sh
+            - pipe: atlassian/rsync-deploy:0.4.3
+              variables:
+                USER: $DEPLOY_USER
+                SERVER: $DEPLOY_HOST
+                REMOTE_PATH: $DEPLOY_PATH
+                LOCAL_PATH: $BITBUCKET_CLONE_DIR/dist/
+                SSH_PORT: '22'
+                EXTRA_ARGS: '-p --delete --exclude-from=$BITBUCKET_CLONE_DIR/deployment-exclude-list.txt'
+                DEBUG: 'true'

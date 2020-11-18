@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const util = require('util');
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
@@ -21,6 +22,8 @@ const componentsLoader = require('./helpers/components/components.loader');
 const skipSetup = process.env.skipSetup || false;
 const isConfigured = config.configured;
 
+const copyFilePromise = util.promisify(fs.copyFile);
+
 /**
  * Remove Assets before writing new files
  * @param {function} callback
@@ -38,6 +41,19 @@ async function removeAssets(callback) {
   } else {
     console.log(chalk.redBright('Callback must be a function.'));
   }
+}
+
+/**
+ * Copy files from one dir to another
+ * @param {string} srcDir
+ * @param {string} destDir
+ * @param {string[]} files
+ * @return Promise
+ */
+function copyFiles(srcDir, destDir, files) {
+  return Promise.all(files.map(f => {
+    return copyFilePromise(path.join(srcDir, f), path.join(destDir, f));
+  }));
 }
 
 async function runSetup() {
@@ -127,6 +143,11 @@ async function runSetup() {
       message: 'Do you want to use Handlebars?',
     },
     {
+      type: 'confirm',
+      name: 'pipelines',
+      message: 'Add Bitbucket Pipelines config?',
+    },
+    {
       type: 'checkbox',
       name: 'js_helpers',
       message: 'Include selected helpers:',
@@ -150,7 +171,7 @@ async function runSetup() {
     if (typeof questions.site_description !== 'undefined') {
       fileContent = fileContent.replace(
         /site_description: '.*?'/g,
-        `site_description: '${questions.site_description}'`
+        `site_description: '${questions.site_description}'`,
       );
     }
     if (typeof questions.site_url !== 'undefined') {
@@ -159,7 +180,7 @@ async function runSetup() {
     if (typeof questions.google_tag_manager !== 'undefined') {
       fileContent = fileContent.replace(
         /googleTagManagerUA: '.*?'/g,
-        `googleTagManagerUA: '${questions.google_tag_manager}'`
+        `googleTagManagerUA: '${questions.google_tag_manager}'`,
       );
     }
     if (typeof questions.css_library !== 'undefined') {
@@ -168,7 +189,7 @@ async function runSetup() {
     if (typeof questions.css_library_scripts !== 'undefined') {
       fileContent = fileContent.replace(
         /css_library_scripts:.*/g,
-        `css_library_scripts: ${questions.css_library_scripts},`
+        `css_library_scripts: ${questions.css_library_scripts},`,
       );
     }
     if (typeof questions.css_reset !== 'undefined') {
@@ -200,14 +221,16 @@ async function runSetup() {
     // Change configurator status
     fileContent = fileContent.replace(/configured:.*/g, 'configured: true,');
 
-    fs.writeFile(path.join(config.root, config.paths.config, 'site.config.js'), fileContent, 'utf8', () => {});
+    fs.writeFile(path.join(config.root, config.paths.config, 'site.config.js'), fileContent, 'utf8', () => {
+    });
   });
 
   // Add CSS reset to stylesheet
   if (questions.css_reset !== 'None' && typeof questions.css_reset !== 'undefined') {
     const cssContent = `// Load CSS Reset from NPM\n @import "~${questions.css_reset}";\n`;
 
-    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), cssContent, () => {});
+    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), cssContent, () => {
+    });
   }
 
   // Add CSS Library to stylesheet
@@ -219,7 +242,8 @@ async function runSetup() {
 
   // add styles.scss entry point
   if (questions.css_library === 'None' && questions.css_reset === 'None') {
-    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), '', () => {});
+    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), '', () => {
+    });
   }
 
   // Add Scripts entry file
@@ -232,14 +256,16 @@ async function runSetup() {
       fs.writeFile(
         path.join(config.root, config.paths.src, `components/components.${questions.js_type}`),
         components,
-        () => {}
+        () => {
+        },
       );
     }
 
     fs.writeFile(
       path.join(config.root, config.paths.src, `scripts/scripts.${questions.js_type}`),
       componentsImport,
-      () => {}
+      () => {
+      },
     );
   }
 
@@ -247,12 +273,27 @@ async function runSetup() {
   if (questions.jquery && typeof questions.jquery !== 'undefined') {
     const jsContent = '// Load jQuery from NPM\n import $ from "jquery";\n\n window.jQuery = $;\n window.$ = $;\n';
 
-    fs.writeFile(path.join(config.root, config.paths.src, `scripts/scripts.${questions.js_type}`), jsContent, () => {});
+    fs.writeFile(path.join(config.root, config.paths.src, `scripts/scripts.${questions.js_type}`), jsContent, () => {
+    });
   }
 
   // Add Helpers files
   if (typeof questions.js_helpers !== 'undefined') {
     helperFilesLoader(questions.js_type, questions.js_helpers);
+  }
+
+  // Add Pipelines
+  if (typeof questions.pipelines !== 'undefined') {
+    // usage
+    copyFiles(
+      path.join(config.root, config.paths.config, 'helpers', 'pipelines'),
+      path.join(config.root),
+      ['bitbucket-pipelines.yml', 'deployment-exclude-list.txt', 'setup-perms.sh'],
+    ).then(() => {
+      console.log('Pipelines done');
+    }).catch(err => {
+      console.log(err);
+    });
   }
 
   // Copy components
@@ -263,7 +304,8 @@ async function runSetup() {
  * Code Review
  * @param {function} callback - Callback fired after Code Review is done
  */
-function runCodeReview(callback = () => {}) {
+function runCodeReview(callback = () => {
+}) {
   console.log(`\n${chalk.gray('One more moment ...')}`);
 
   const child = exec('npm run fix:html && npm run fix:styles && npm run fix:scripts');

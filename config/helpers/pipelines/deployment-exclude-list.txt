@@ -1,0 +1,14 @@
+.git
+.gitignore
+.bitbucket
+.DS_Store
+.idea
+dockerfile-dev
+/docker
+INSTALL.txt
+LICENSES
+docker-compose.yml
+readme.md
+node_modules
+bitbucket-pipelines.yml
+deployment-exclude-list.txt
