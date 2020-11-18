@@ -6,6 +6,8 @@ pipelines:
       - step:
           name: Deployment to dev.they.net
           deployment: Staging
+          caches:
+            - node
           script:
             - npm install && npm run build:dist
             - cd $BITBUCKET_CLONE_DIR/dist && sh $BITBUCKET_CLONE_DIR/setup-perms.sh
