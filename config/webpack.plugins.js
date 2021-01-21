@@ -79,9 +79,12 @@ const generateHTMLPlugins = () => {
 };
 
 // Sitemap
-const sitemap = new SitemapPlugin(config.site_url, paths, {
-  priority: 1.0,
-  lastmodrealtime: true,
+const sitemap = new SitemapPlugin({
+  base: config.site_url,
+  paths,
+  options: {
+    priority: 1,
+  },
 });
 
 // Favicons

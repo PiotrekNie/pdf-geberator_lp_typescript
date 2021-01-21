@@ -9,34 +9,34 @@ if (!ROOT) {
 
 const config = {
   // If true, run project configurator
-  configured: false,
+  configured: true,
 
   // Your website's name, used for favicon meta tags
-  site_name: '',
+  site_name: 'Test',
 
   // Your website's description, used for favicon meta tags
-  site_description: '',
+  site_description: 'test',
 
   // Your website's URL, used for sitemap
-  site_url: '',
+  site_url: 'https://google.com',
 
   // CSS Library
-  css_library: '',
+  css_library: 'None',
 
   // CSS Library scripts
   css_library_scripts: false,
 
   // Reset Library
-  css_reset: '',
+  css_reset: 'None',
 
   // Purge CSS
-  purge_css: false,
+  purge_css: true,
 
   // Preload Variables
   preloadedCSSVariables: [],
 
   // JS Type
-  js_type: '',
+  js_type: 'ts',
 
   // Add jQuery
   jQuery: false,
