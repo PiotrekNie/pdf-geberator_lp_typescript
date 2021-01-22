@@ -15,6 +15,7 @@ const handlebars = {
   loader: 'handlebars-loader',
   query: {
     debug: false,
+    inlineRequires: /^((?!http|'http|\/\/|'\/\/)(\S+)\/(images|videos|files)\/(\S+)|['"](images|videos|files)|(images|videos|files)\/(\S+))/,
     // partialDirs: getDirectories(componentsPath).map(file => {
     //   return path.join(config.root, config.paths.src, config.paths.components, file);
     // }),
