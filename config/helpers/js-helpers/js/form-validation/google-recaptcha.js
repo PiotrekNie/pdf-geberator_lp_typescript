@@ -1,24 +1,43 @@
 /**
  * @class GoogleRecaptcha - https://developers.google.com/recaptcha/docs/v3
  * @param {string} siteKey - unique site key for Google Recaptcha
- * @param {string} inputName - name of the input to store the token
+ * @param {string} [somebody=g-recaptcha-response] inputName - name of the input to store the token
  *
  * Before initialization, make sure you add the <script> tag with the same siteKey
  * <script src="https://www.google.com/recaptcha/api.js?render=siteKey"></script>
  *
  */
+
+/* global grecaptcha */
+
 class GoogleRecaptcha {
-  private readonly inputName: string = 'g-recaptcha-response';
+  /**
+   * @type {string}
+   */
+  inputName;
 
-  private readonly siteKey: string;
+  /**
+   * @type {string}
+   */
+  siteKey;
 
-  constructor(siteKey: string, inputName?: string) {
+  /**
+   *
+   * @param {string} siteKey
+   * @param {string} [inputName=g-recaptcha-response] captchaName
+   */
+  constructor(siteKey, inputName = 'g-recaptcha-response') {
     this.siteKey = siteKey;
     this.inputName = inputName || this.inputName;
   }
 
-  private static async ready(): Promise<boolean> {
-    return new Promise((resolve: (value: boolean | PromiseLike<boolean>) => void) => {
+  /**
+   *
+   * @static
+   * @return {Promise<boolean>}
+   */
+  static async ready() {
+    return new Promise((resolve) => {
       grecaptcha.ready(() => {
         resolve(true);
       });
@@ -27,13 +46,18 @@ class GoogleRecaptcha {
 
   /**
    *
+   * @public
    * @param {HTMLFormElement} form - The form element to which the token should be added
    * @param {string} token - Google Recaptcha token
    *
    * Create or update an input field with a Google Recaptcha token
    */
-  public createTokenInput: (form: HTMLFormElement, token: string) => void = (form: HTMLFormElement, token: string) => {
-    let tokenInput: HTMLInputElement = form.querySelector(`[name='${this.inputName}']`);
+  createTokenInput = (form, token) => {
+    /**
+     *
+     * @type {HTMLInputElement}
+     */
+    let tokenInput = form.querySelector(`[name='${this.inputName}']`);
 
     if (tokenInput instanceof HTMLInputElement) {
       tokenInput.value = token;
@@ -51,10 +75,13 @@ class GoogleRecaptcha {
    *
    * @public
    *
+   * @param {string} [action=submit] action
+   * @return {PromiseLike<string>}
+   *
    * This method returns the promise of Google Recaptcha token.
    * The token must be verified in the backend.
    */
-  public async execute(action: string = 'submit'): Promise<string> {
+  async execute(action = 'submit') {
     await GoogleRecaptcha.ready();
     return grecaptcha.execute(this.siteKey, { action });
   }
@@ -67,10 +94,14 @@ class GoogleRecaptcha {
    *
    * This method will automatically create an input to store the Google Recaptcha token
    */
-  public async submit(form: HTMLFormElement): Promise<string> {
-    const token: string = await this.execute();
+  async submit(form) {
+    /**
+     *
+     * @type {string}
+     */
+    const token = await this.execute();
 
-    return new Promise((resolve: (value: string | PromiseLike<string>) => void) => {
+    return new Promise((resolve) => {
       this.createTokenInput(form, token);
 
       resolve(token);
