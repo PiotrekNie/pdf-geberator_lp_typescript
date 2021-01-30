@@ -14,9 +14,6 @@ const config = {
   // Your website's name, used for favicon meta tags
   site_name: '',
 
-  // Your website's description, used for favicon meta tags
-  site_description: '',
-
   // Your website's URL, used for sitemap
   site_url: '',
 
