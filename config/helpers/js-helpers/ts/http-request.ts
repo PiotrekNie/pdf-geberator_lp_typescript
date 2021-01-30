@@ -1,4 +1,14 @@
-// TODO: remove any
+type RequestBodyJSON =
+  | string
+  | FormData
+  | Document
+  | Blob
+  | ArrayBufferView
+  | ArrayBuffer
+  | URLSearchParams
+  | ReadableStream<Uint8Array>;
+
+type QueryParams = { [key: string]: string | number | boolean };
 
 export interface RequestOptions {
   ignoreCache?: boolean;
@@ -23,15 +33,13 @@ export const DEFAULT_REQUEST_OPTIONS: RequestOptions = {
   timeout: 0,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function queryParameters(params: { [key: string]: any } = {}): string {
+export function queryParameters(params: QueryParams = {}): string {
   return Object.keys(params)
     .map((k: string) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
     .join('&');
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function withQuery(url: string, params: { [key: string]: any } = {}): string {
+function withQuery(url: string, params: QueryParams = {}): string {
   const queryString: string = queryParameters(params);
   return queryString ? url + (url.indexOf('?') === -1 ? '?' : '&') + queryString : url;
 }
@@ -62,8 +70,8 @@ export function httpRequest(
   method: 'get' | 'post',
   url: string,
   options: RequestOptions = DEFAULT_REQUEST_OPTIONS,
-  body: any = null, // eslint-disable-line @typescript-eslint/no-explicit-any
-  queryParams: { [key: string]: any } = {} // eslint-disable-line @typescript-eslint/no-explicit-any
+  body: RequestBodyJSON = null,
+  queryParams: QueryParams = {}
 ): Promise<RequestResult> {
   const ignoreCache: boolean = options.ignoreCache || DEFAULT_REQUEST_OPTIONS.ignoreCache;
   const headers: { [key: string]: string } = options.headers || DEFAULT_REQUEST_OPTIONS.headers;
@@ -96,8 +104,14 @@ export function httpRequest(
     };
 
     if (method === 'post' && body) {
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify(body));
+      let bodyRequest: RequestBodyJSON = body;
+
+      if (!(body instanceof FormData)) {
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        bodyRequest = JSON.stringify(body);
+      }
+
+      xhr.send(bodyRequest);
     } else {
       xhr.send();
     }

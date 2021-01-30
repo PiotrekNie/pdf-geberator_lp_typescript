@@ -120,8 +120,14 @@ export function httpRequest(
     };
 
     if (method === 'post' && body) {
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.send(JSON.stringify(body));
+      let bodyRequest = body;
+
+      if (!(body instanceof FormData)) {
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        bodyRequest = JSON.stringify(body);
+      }
+
+      xhr.send(bodyRequest);
     } else {
       xhr.send();
     }
