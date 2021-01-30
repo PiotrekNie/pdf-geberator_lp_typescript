@@ -38,9 +38,6 @@ const config = {
   // JS Type
   js_type: '',
 
-  // Add jQuery
-  jQuery: false,
-
   // Helpers
   js_helpers: [],
 

@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const fse = require('fs-extra');
 const chalk = require('chalk');
 
 const config = require('../../site.config');
@@ -13,23 +14,21 @@ const config = require('../../site.config');
 function helperFilesLoader(scriptsLanguage, helpers) {
   if (helpers.length) {
     fs.mkdir(path.join(config.root, config.paths.src, 'scripts/helpers'), { recursive: true }, () => {
+      const helpersDir = path.join(config.root, config.paths.config, 'helpers/js-helpers', scriptsLanguage);
+      const helpersDist = path.join(config.root, config.paths.src, 'scripts/helpers');
+
       helpers.forEach((helper) => {
-        const fileURL = path.join(
-          config.root,
-          config.paths.config,
-          'helpers/js-helpers',
-          scriptsLanguage,
-          `${helper}.${scriptsLanguage}`
-        );
+        const fileURL = path.join(helpersDir, `${helper}.${scriptsLanguage}`);
+        const dirURL = path.join(helpersDir, helper);
+
+        console.log('dirExists', dirURL);
 
         if (fs.existsSync(fileURL)) {
           const file = fs.readFileSync(fileURL);
 
-          fs.writeFile(
-            path.join(config.root, config.paths.src, 'scripts/helpers', `${helper}.${scriptsLanguage}`),
-            file,
-            () => {}
-          );
+          fs.writeFile(path.join(helpersDist, `${helper}.${scriptsLanguage}`), file, () => {});
+        } else if (fs.existsSync(dirURL)) {
+          fse.copySync(dirURL, path.join(helpersDist, helper), { errorOnExist: true });
         } else {
           console.log(chalk.redBright(`${helper} helper is not available yet. Skipping.`));
         }
