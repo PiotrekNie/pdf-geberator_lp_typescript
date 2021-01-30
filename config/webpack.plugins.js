@@ -61,7 +61,7 @@ const generateHTMLPlugins = () => {
     .sync('./src/**/*.html', {
       ignore: ['./src/components/**/*.html'], // ignore components
     })
-    .map(dir => {
+    .map((dir) => {
       const filename = path.basename(dir);
 
       if (filename !== '404.html') {
@@ -127,7 +127,7 @@ class GoogleTagManagerPlugin {
   }
 
   apply(compiler) {
-    compiler.hooks.compilation.tap('GoogleTagManagerPlugin', compilation => {
+    compiler.hooks.compilation.tap('GoogleTagManagerPlugin', (compilation) => {
       HTMLWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('GoogleTagManagerPlugin', (data, cb) => {
         const pageData = data;
         pageData.html = data.html.replace('</head>', `${CODE_HEAD.replace('{{ID}}', this.id)}</head>`);
@@ -154,8 +154,8 @@ module.exports = [
   fs.existsSync(config.favicon) && favicons,
   config.env === 'production' && optimizeCss,
   config.env === 'production' && config.purge_css && purgeCSS,
-  config.env === 'production' && robots,
-  config.env === 'production' && sitemap,
+  config.env === 'production' && config.site_url && robots,
+  config.env === 'production' && config.site_url && sitemap,
   config.googleTagManagerUA && google,
   webpackBar,
   config.env === 'development' && hmr,

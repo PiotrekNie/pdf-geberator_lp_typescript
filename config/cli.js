@@ -16,7 +16,7 @@ function ensureExists(extPath, mask, callback) {
     // eslint-disable-next-line no-param-reassign
     callback = mask;
   }
-  fs.mkdir(extPath, { recursive: false }, err => {
+  fs.mkdir(extPath, { recursive: false }, (err) => {
     if (err) {
       if (err.code.toUpperCase() === 'EEXIST') callback('EEXIST');
       // ignore the error if the folder already exists
@@ -36,7 +36,7 @@ async function createComponent() {
     const componentName = argvPath.substring(argvPath.lastIndexOf('/') + 1);
     const componentPath = path.join(config.root, config.paths.src, config.paths.components, argvPath);
 
-    ensureExists(componentPath, 0744, err => {
+    ensureExists(componentPath, 0744, (err) => {
       if (err === 'CREATED') {
         fs.writeFile(
           path.join(componentPath, `${componentName}.${config.js_type}`),
@@ -45,6 +45,19 @@ async function createComponent() {
         );
         fs.writeFile(path.join(componentPath, `${componentName}.scss`), '', () => {});
         fs.writeFile(path.join(componentPath, `${componentName}.html`), `${componentName} works!`, () => {});
+
+        // import into components.ts
+        const mainComponentsFile = path.join(
+          config.root,
+          config.paths.src,
+          config.paths.components,
+          `components.${config.js_type}`
+        );
+
+        const componentImport = `import './${argvPath.replace(/^\//, '')}/${componentName}';\n`; // eslint-disable-line quotes
+        const mainComponentsFileContent = fs.readFileSync(mainComponentsFile);
+
+        fs.writeFileSync(mainComponentsFile, componentImport + mainComponentsFileContent);
 
         console.log(chalk.green(`Component ${componentName} has been created!`));
         console.log(chalk.blue(`Component path: ${path.join(config.paths.src, config.paths.components, argvPath)}`));

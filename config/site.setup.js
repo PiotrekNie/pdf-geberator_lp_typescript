@@ -34,6 +34,9 @@ async function removeAssets(callback) {
     path.join(config.root, config.paths.src, 'styles/styles.scss'),
     path.join(config.root, config.paths.src, 'scripts/scripts.ts'),
     path.join(config.root, config.paths.src, 'scripts/scripts.js'),
+    path.join(config.root, config.paths.src, 'scripts/.gitkeep'),
+    path.join(config.root, config.paths.src, 'components/.gitkeep'),
+    path.join(config.root, config.paths.src, 'styles/.gitkeep'),
   ]);
 
   if (typeof callback === 'function') {
@@ -70,17 +73,17 @@ async function runSetup() {
       message: 'What is the name of your website?',
       default: 'Starter Project',
     },
-    {
-      type: 'input',
-      name: 'site_description',
-      message: 'What is a description of your website?',
-      validate: (input) => {
-        if (!input) {
-          console.log(chalk.redBright(' - This field is required'));
-        }
-        return !!input;
-      },
-    },
+    // {
+    //   type: 'input',
+    //   name: 'site_description',
+    //   message: 'What is a description of your website?',
+    //   validate: (input) => {
+    //     if (!input) {
+    //       console.log(chalk.redBright(' - This field is required'));
+    //     }
+    //     return !!input;
+    //   },
+    // },
     {
       type: 'input',
       name: 'site_url',
@@ -89,10 +92,10 @@ async function runSetup() {
         const expression = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gi;
         const isURL = new RegExp(expression);
 
-        if (!input.match(isURL)) {
+        if (!input.match(isURL) && input.length > 0) {
           console.log(chalk.redBright(' - Enter a valid URL'));
         }
-        return !!input.match(isURL);
+        return !!input.match(isURL) || input.length === 0;
       },
     },
     {
@@ -104,7 +107,7 @@ async function runSetup() {
       type: 'list',
       name: 'css_library',
       message: 'Which CSS Framework would you like installed?',
-      choices: ['Foundation Zurb', 'Bootstrap', 'None'],
+      choices: ['Bootstrap', 'Foundation Zurb (deprecated)', 'None'],
     },
     {
       when: (answers) => answers.css_library === 'None',
@@ -113,12 +116,6 @@ async function runSetup() {
       message: 'Which CSS Reset library would you like installed?',
       choices: ['normalize.css', 'reset.css', 'sanitize.css', 'None'],
     },
-    // {
-    //   when: answers => answers.css_library !== 'None',
-    //   type: 'confirm',
-    //   name: 'css_library_scripts',
-    //   message: 'Do you want to use the scripts of the selected library? (TODO)', // TODO: add CSS Library Scripts
-    // },
     {
       type: 'confirm',
       name: 'purge_css',
@@ -139,11 +136,6 @@ async function runSetup() {
       message: 'Do you want to use Handlebars?',
     },
     {
-      type: 'confirm',
-      name: 'pipelines',
-      message: 'Add Bitbucket Pipelines config?',
-    },
-    {
       type: 'checkbox',
       name: 'js_helpers',
       message: 'Include selected helpers:',
@@ -154,6 +146,11 @@ async function runSetup() {
         { name: 'NuLead (not available)', value: 'nulead' },
         { name: 'Translations (not available)', value: 'i18n' },
       ],
+    },
+    {
+      type: 'confirm',
+      name: 'pipelines',
+      message: 'Add Bitbucket Pipelines config?',
     },
   ]);
 
@@ -181,12 +178,6 @@ async function runSetup() {
     }
     if (typeof questions.css_library !== 'undefined') {
       fileContent = fileContent.replace(/css_library: '.*?'/g, `css_library: '${questions.css_library}'`);
-    }
-    if (typeof questions.css_library_scripts !== 'undefined') {
-      fileContent = fileContent.replace(
-        /css_library_scripts:.*/g,
-        `css_library_scripts: ${questions.css_library_scripts},`
-      );
     }
     if (typeof questions.css_reset !== 'undefined') {
       fileContent = fileContent.replace(/css_reset: '.*?'/g, `css_reset: '${questions.css_reset}'`);
@@ -224,18 +215,6 @@ async function runSetup() {
     fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), cssContent, () => {});
   }
 
-  // Add CSS Library to stylesheet
-  if (questions.css_library === 'Foundation Zurb' && typeof questions.css_library !== 'undefined') {
-    foundation.prepareFiles();
-  } else if (questions.css_library === 'Bootstrap' && typeof questions.css_library !== 'undefined') {
-    bootstrap.prepareFiles();
-  }
-
-  // add styles.scss entry point
-  if (questions.css_library === 'None' && questions.css_reset === 'None') {
-    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), '', () => {});
-  }
-
   // Add Scripts entry file
   if (typeof questions.js_type !== 'undefined') {
     const componentsImport = '// import components\n import "../components/components";';
@@ -250,17 +229,29 @@ async function runSetup() {
       );
     }
 
-    fs.writeFile(
+    fs.writeFileSync(
       path.join(config.root, config.paths.src, `scripts/scripts.${questions.js_type}`),
-      componentsImport,
-      () => {}
+      componentsImport
     );
+  }
+
+  // add styles.scss entry point
+  if (questions.css_library === 'None' && questions.css_reset === 'None') {
+    fs.writeFile(path.join(config.root, config.paths.src, 'styles/styles.scss'), '', () => {});
+  }
+
+  // Add CSS Library to stylesheet
+  if (questions.css_library === 'Foundation Zurb' && typeof questions.css_library !== 'undefined') {
+    foundation.prepareFiles();
+  } else if (questions.css_library === 'Bootstrap' && typeof questions.css_library !== 'undefined') {
+    bootstrap.prepareFiles(questions.js_type);
   }
 
   // Add Helpers files
   if (typeof questions.js_helpers !== 'undefined') {
     helperFilesLoader(questions.js_type, questions.js_helpers);
   }
+
   // Add Pipelines
   if (typeof questions.pipelines !== 'undefined' && questions.pipelines) {
     // usage
@@ -281,10 +272,6 @@ async function runSetup() {
   componentsLoader(questions.js_type);
 }
 
-/**
- * Code Review
- * @param {function} callback - Callback fired after Code Review is done
- */
 function runCodeReview(callback = () => {}) {
   console.log(`\n${chalk.gray('One more moment ...')}`);
 

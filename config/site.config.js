@@ -23,9 +23,6 @@ const config = {
   // CSS Library
   css_library: '',
 
-  // CSS Library scripts
-  css_library_scripts: false,
-
   // Reset Library
   css_reset: '',
 
