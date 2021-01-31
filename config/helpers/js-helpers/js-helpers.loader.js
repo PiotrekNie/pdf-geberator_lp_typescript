@@ -21,8 +21,6 @@ function helperFilesLoader(scriptsLanguage, helpers) {
         const fileURL = path.join(helpersDir, `${helper}.${scriptsLanguage}`);
         const dirURL = path.join(helpersDir, helper);
 
-        console.log('dirExists', dirURL);
-
         if (fs.existsSync(fileURL)) {
           const file = fs.readFileSync(fileURL);
 
