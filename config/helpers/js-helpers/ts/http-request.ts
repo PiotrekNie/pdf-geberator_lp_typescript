@@ -104,14 +104,11 @@ export function httpRequest(
     };
 
     if (method === 'post' && body) {
-      let bodyRequest: RequestBodyJSON = body;
-
       if (!(body instanceof FormData)) {
         xhr.setRequestHeader('Content-Type', 'application/json');
-        bodyRequest = JSON.stringify(body);
       }
 
-      xhr.send(bodyRequest);
+      xhr.send(body);
     } else {
       xhr.send();
     }
