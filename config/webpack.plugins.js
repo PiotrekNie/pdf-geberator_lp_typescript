@@ -14,6 +14,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const RobotstxtPlugin = require('robotstxt-webpack-plugin');
 const SitemapPlugin = require('sitemap-webpack-plugin').default;
 const PurgecssPlugin = require('purgecss-webpack-plugin');
+const { ESBuildPlugin } = require('esbuild-loader');
 
 const config = require('./site.config');
 
@@ -64,13 +65,17 @@ const generateHTMLPlugins = () => {
     .map((dir) => {
       const filename = path.basename(dir);
 
+      const directory = dir.replace(filename, '').replace('./src/', '');
+
+      const fullPath = directory + filename;
+
       if (filename !== '404.html') {
-        paths.push(filename);
+        paths.push(fullPath);
       }
 
       return new HTMLWebpackPlugin({
-        filename,
-        template: path.join(config.root, config.paths.src, filename),
+        filename: fullPath,
+        template: path.join(config.root, config.paths.src, fullPath),
         meta: {
           viewport: config.viewport,
         },
@@ -150,6 +155,7 @@ module.exports = [
   clean,
   stylelint,
   cssExtract,
+  new ESBuildPlugin(),
   ...generateHTMLPlugins(),
   fs.existsSync(config.favicon) && favicons,
   config.env === 'production' && optimizeCss,

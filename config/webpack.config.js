@@ -1,3 +1,4 @@
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 const path = require('path');
 
 const config = require('./site.config');
@@ -26,6 +27,14 @@ module.exports = {
     open: true,
     port: config.port,
     host: config.dev_host,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new ESBuildMinifyPlugin({
+        target: 'es2015',
+      }),
+    ],
   },
   module: {
     rules: loaders,

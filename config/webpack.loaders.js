@@ -49,9 +49,10 @@ const js = {
   exclude: /node_modules/,
   use: [
     {
-      loader: 'babel-loader',
+      loader: 'esbuild-loader',
       options: {
-        presets: ['@babel/preset-env'],
+        loader: 'js',
+        target: 'es2015',
       },
     },
     'eslint-loader',
@@ -62,7 +63,16 @@ const js = {
 const ts = {
   test: /\.ts?$/,
   exclude: /node_modules/,
-  use: ['ts-loader', 'eslint-loader'],
+  use: [
+    {
+      loader: 'esbuild-loader',
+      options: {
+        loader: 'ts',
+        target: 'es2015',
+      },
+    },
+    'eslint-loader',
+  ],
 };
 
 // select scripts loader
