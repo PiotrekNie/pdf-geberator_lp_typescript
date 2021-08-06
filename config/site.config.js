@@ -9,28 +9,28 @@ if (!ROOT) {
 
 const config = {
   // If true, run project configurator
-  configured: false,
+  configured: true,
 
   // Your website's name, used for favicon meta tags
-  site_name: '',
+  site_name: 'Nestle Generator Etykiet',
 
   // Your website's URL, used for sitemap
-  site_url: '',
+  site_url: 'https://dev.they.net.pl/nestle/generator-metryczek',
 
   // CSS Library
-  css_library: '',
+  css_library: 'Bootstrap',
 
   // Reset Library
   css_reset: '',
 
   // Purge CSS
-  purge_css: false,
+  purge_css: true,
 
   // Preload Variables (provide absolute path)
   preloadedCSSVariables: [],
 
   // JS Type
-  js_type: '',
+  js_type: 'ts',
 
   // Helpers
   js_helpers: [],

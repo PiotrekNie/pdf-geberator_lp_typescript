@@ -1,12 +1,9 @@
 {
-  "name": "starter-template",
+  "name": "nestle_pdf-generator_lp_javascript",
   "description": "A modern boilerplate for static website development",
   "version": "0.0.3",
   "homepage": "https://miotelka.me",
-  "author": {
-    "name": "Marek Miotelka",
-    "url": "https://miotelka.me"
-  },
+  "author": "Marek Miotelka (https://miotelka.me)",
   "repository": {
     "type": "git",
     "url": "git+https://bitbucket.org/marmiot/starter-template.git"
@@ -34,10 +31,10 @@
     "build:dist": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js",
     "setup": "node ./config/site.setup.js",
     "lint:styles": "stylelint \"src/**/*.scss\"",
-    "lint:scripts": "./node_modules/.bin/eslint --ext .js --ext .jsx --ext .ts --ext .tsx \"src\"",
+    "lint:scripts": "eslint --ext .js --ext .jsx --ext .ts --ext .tsx \"src\"",
     "fix:html": "prettier \"src/**/*.html\" --write",
     "fix:styles": "stylelint \"src/**/*.scss\" --fix",
-    "fix:scripts": "./node_modules/.bin/eslint --ext .js --ext .jsx --ext .ts --ext .tsx \"src\" --fix",
+    "fix:scripts": "eslint --ext .js --ext .jsx --ext .ts --ext .tsx \"src\" --fix",
     "postinstall": "npm run setup",
     "lint-staged": "lint-staged",
     "deploy": "node ./config/site.deploy.js",
@@ -144,5 +141,6 @@
     "src/**/*.scss": [
       "npm run fix:styles"
     ]
-  }
+  },
+  "main": "postcss.config.js"
 }
