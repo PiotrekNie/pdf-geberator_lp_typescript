@@ -1,6 +1,8 @@
 module.exports = () => ({
   browsers: ['> 0.25%', 'ie >= 11'],
   plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
     'postcss-sorting': {
       order: ['custom-properties', 'dollar-variables', 'declarations', 'at-rules', 'rules'],
       'properties-order': [
