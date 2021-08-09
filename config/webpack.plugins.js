@@ -149,6 +149,16 @@ const google = new GoogleTagManagerPlugin({
 
 const purgeCSS = new PurgecssPlugin({
   paths: glob.sync(path.join(config.root, config.paths.src, '/**/*'), { nodir: true }),
+  safelist: [
+    'page-node-3076257',
+    'page-cover-light',
+    'row',
+    'block-block-256',
+    'node--page',
+    'footer',
+    'footer__top',
+    'footer__bottom',
+  ],
 });
 
 module.exports = [

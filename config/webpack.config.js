@@ -11,6 +11,9 @@ module.exports = {
     path.join(config.root, config.paths.src, 'styles/styles.scss'),
     path.join(config.root, config.paths.src, `scripts/scripts.${config.js_type}`),
   ],
+  node: {
+    fs: 'empty',
+  },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },

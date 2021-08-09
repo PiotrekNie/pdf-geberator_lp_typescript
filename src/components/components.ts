@@ -1,1 +1,1 @@
-import './sample-component/sample-component';
+import './form/form';
