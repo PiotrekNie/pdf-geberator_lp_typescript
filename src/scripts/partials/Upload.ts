@@ -115,40 +115,35 @@ class UploadFile {
         }))();
     };
 
-    const generatePDF: (directory: string, userId: string, serialNumber: string, label: string) => void = (
-      directory: string,
-      userId: string,
-      serialNumber: string,
-      label: string
-    ) => {
-      const formData: FormData = new FormData();
+    const generatePDF: (directory: string, userId: string, serialNumber: string, label: string, photo: string) => void =
+      (directory: string, userId: string, serialNumber: string, label: string, photo: string) => {
+        const formData: FormData = new FormData();
 
-      formData.append('directory', directory);
-      formData.append('userId', userId);
-      formData.append('serialNumber', serialNumber);
-      formData.append('label', label);
+        formData.append('directory', directory);
+        formData.append('userId', userId);
+        formData.append('serialNumber', serialNumber);
+        formData.append('label', label);
 
-      const request: Request = new Request('../../generators/pdf/index.php', {
-        method: 'POST',
-        body: formData,
-        headers: new Headers(),
-      });
+        const request: Request = new Request('../../generators/pdf/index.php', {
+          method: 'POST',
+          body: formData,
+          headers: new Headers(),
+        });
 
-      fetch(`https://localhost/generators/data/${directory}/${userId}/kid-photo.jpg`).then((response: Response) => {
-        if (response.status === 200) {
-          console.log(response);
-          fetch(request)
-            .then((resp: Response) => {
-              if (resp.status === 200) {
-                // console.log(resp);
-              }
-            })
-            .catch((error: string) => {
-              throw new Error(error);
-            });
-        }
-      });
-    };
+        fetch(`https://localhost/generators/data/${directory}/${userId}/kid-photo.png`).then((response: Response) => {
+          if (response.status === 200) {
+            fetch(request)
+              .then((resp: Response) => {
+                if (resp.status === 200) {
+                  // console.log(resp);
+                }
+              })
+              .catch((error: string) => {
+                throw new Error(error);
+              });
+          }
+        });
+      };
 
     const generateJSON: () => void = async () => {
       updateStatus('.status', 'Wczytuję plik...');
@@ -189,7 +184,7 @@ class UploadFile {
               })
               .then(() => {
                 rowObject.forEach((obj: RowObject) => {
-                  generatePDF(serialRange, obj['Serial number'], obj['User Id'], obj.Label);
+                  generatePDF(serialRange, obj['Serial number'], obj['User Id'], obj.Label, obj.Photo);
                 });
               })
               .then(() => {
