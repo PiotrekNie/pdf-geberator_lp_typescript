@@ -4,8 +4,15 @@
     "es6": true
   },
   "parser": "@typescript-eslint/parser",
-  "extends": ["airbnb", "eslint:recommended", "plugin:prettier/recommended", "prettier"],
-  "plugins": ["prettier"],
+  "extends": [
+    "airbnb",
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "prettier"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -20,16 +27,35 @@
     },
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
       }
     }
   },
   "rules": {
-    "max-len": ["warn", 120],
+    "max-len": [
+      "warn",
+      360
+    ],
     "no-empty": 1,
-    "linebreak-style": [1, "unix"],
-    "quotes": [2, "single"],
-    "no-unused-expressions": [1, { "allowTernary": true }],
+    "linebreak-style": [
+      1,
+      "unix"
+    ],
+    "quotes": [
+      2,
+      "single"
+    ],
+    "no-unused-expressions": [
+      1,
+      {
+        "allowTernary": true
+      }
+    ],
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -43,8 +69,13 @@
   },
   "overrides": [
     {
-      "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@typescript-eslint/recommended"],
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "extends": [
+        "plugin:@typescript-eslint/recommended"
+      ],
       "rules": {
         "@typescript-eslint/typedef": [
           "error",
@@ -58,8 +89,12 @@
             "propertyDeclaration": true
           }
         ],
-        "@typescript-eslint/no-inferrable-types": [0],
-        "@typescript-eslint/member-ordering": ["error"]
+        "@typescript-eslint/no-inferrable-types": [
+          0
+        ],
+        "@typescript-eslint/member-ordering": [
+          "error"
+        ]
       }
     }
   ]

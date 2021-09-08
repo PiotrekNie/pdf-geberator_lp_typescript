@@ -3,7 +3,7 @@ import 'tailwindcss/tailwind.css';
 import UploadFile from './partials/Upload';
 
 class App {
-  private upload: UploadFile = new UploadFile('input');
+  private upload: UploadFile = new UploadFile('input', '#button', '#filename');
 
   constructor() {
     this.initApp();

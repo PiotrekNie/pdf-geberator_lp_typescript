@@ -1,9 +1,15 @@
 {
   "[scss]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "mrmlnc.vscode-postcss-sorting"
   },
   "postcssSorting.config": {
-    "order": ["dollar-variables", "declarations", "at-rules", "rules", "custom-properties"],
+    "order": [
+      "dollar-variables",
+      "declarations",
+      "at-rules",
+      "rules",
+      "custom-properties"
+    ],
     "properties-order": [
       "position",
       "top",

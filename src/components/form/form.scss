@@ -1,0 +1,11 @@
+#button {
+  &[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+#jsondata {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}

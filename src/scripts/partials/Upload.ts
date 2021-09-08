@@ -1,6 +1,4 @@
 import * as XLSX from 'xlsx';
-import * as stream from 'stream';
-import fs from 'fs';
 
 interface RowObject {
   [key: string]: string;
@@ -9,16 +7,51 @@ interface RowObject {
 class UploadFile {
   private inputId: string;
 
-  constructor(inputId: string) {
+  private buttonClass: string;
+
+  private fileNameId: string;
+
+  constructor(inputId: string, buttonClass: string, fileNameId: string) {
     this.inputId = inputId;
+    this.buttonClass = buttonClass;
+    this.fileNameId = fileNameId;
   }
 
   public init(): void {
     let selectedFile: FileList;
+    const button: HTMLButtonElement = document.querySelector(this.buttonClass);
+    const filenameSpan: HTMLElement = document.querySelector(this.fileNameId);
+    const funcMouseOver: (ev: Event) => void = (ev: Event) => {
+      const inputContainer: HTMLElement = (<HTMLInputElement>ev.target).parentElement;
+
+      if (ev.type === 'dragleave') {
+        inputContainer.className =
+          'relative h-40 rounded-lg border-dashed border-2 border-gray-200 bg-white flex justify-center items-center hover:cursor-pointer';
+        return;
+      }
+
+      inputContainer.className =
+        'relative h-40 rounded-lg border-dashed border-2 border-blue-400 bg-gray-100 flex justify-center items-center hover:cursor-pointer';
+    };
 
     document.getElementById(this.inputId).addEventListener('change', (ev: Event) => {
       selectedFile = (<HTMLInputElement>ev.target).files;
+
+      if (!button || !filenameSpan) {
+        return;
+      }
+
+      if (selectedFile.length > 0) {
+        button.disabled = false;
+        filenameSpan.textContent = selectedFile[0].name;
+        filenameSpan.parentElement.className = 'button';
+      }
     });
+
+    document.getElementById(this.inputId).addEventListener('dragenter', funcMouseOver, false);
+    document.getElementById(this.inputId).addEventListener('dragleave', funcMouseOver, false);
+    document.getElementById(this.inputId).addEventListener('dragover', funcMouseOver, false);
+    document.getElementById(this.inputId).addEventListener('drop', funcMouseOver, false);
 
     /**
      * Displat Upload & generate file status
@@ -30,19 +63,19 @@ class UploadFile {
       document.querySelector(element).textContent = text;
     };
 
-    const getBase64Image: (src: string, name: string) => void = (src: string, name: string) => {
-      const ReadableData: typeof stream.Readable = stream.Readable;
+    // const getBase64Image: (src: string, name: string) => void = (src: string, name: string) => {
+    //   const ReadableData: typeof stream.Readable = stream.Readable;
 
-      const imageBufferData: Buffer = Buffer.from(src, 'base64');
+    //   const imageBufferData: Buffer = Buffer.from(src, 'base64');
 
-      const streamObj: stream.Readable = new ReadableData();
+    //   const streamObj: stream.Readable = new ReadableData();
 
-      streamObj.push(imageBufferData);
+    //   streamObj.push(imageBufferData);
 
-      streamObj.push(null);
+    //   streamObj.push(null);
 
-      streamObj.pipe(fs.createWriteStream(`${name}.png`));
-    };
+    //   streamObj.pipe(fs.createWriteStream(`${name}.png`));
+    // };
 
     const wait: (ms: number) => Promise<unknown> = async (ms: number) => {
       return new Promise((resolve: (arg: unknown) => void) => {
@@ -72,7 +105,7 @@ class UploadFile {
           formData.append('filename', filename);
           formData.append('directory', directory);
 
-          const request: Request = new Request('../../generators/uploads/index.php', {
+          const request: Request = new Request('../generators/uploads/index.php', {
             method: 'POST',
             body: formData,
             headers: new Headers(),
@@ -97,7 +130,7 @@ class UploadFile {
 
           formData.append('range', range);
 
-          const request: Request = new Request('../../generators/mkdir/index.php', {
+          const request: Request = new Request('../generators/mkdir/index.php', {
             method: 'POST',
             body: formData,
             headers: new Headers(),
@@ -115,22 +148,27 @@ class UploadFile {
         }))();
     };
 
-    const generatePDF: (directory: string, userId: string, serialNumber: string, label: string, photo: string) => void =
-      (directory: string, userId: string, serialNumber: string, label: string, photo: string) => {
-        const formData: FormData = new FormData();
+    const generatePDF: (directory: string, userId: string, serialNumber: string, label: string) => void = (
+      directory: string,
+      userId: string,
+      serialNumber: string,
+      label: string
+    ) => {
+      const formData: FormData = new FormData();
 
-        formData.append('directory', directory);
-        formData.append('userId', userId);
-        formData.append('serialNumber', serialNumber);
-        formData.append('label', label);
+      formData.append('directory', directory);
+      formData.append('userId', userId);
+      formData.append('serialNumber', serialNumber);
+      formData.append('label', label);
 
-        const request: Request = new Request('../../generators/pdf/index.php', {
-          method: 'POST',
-          body: formData,
-          headers: new Headers(),
-        });
+      const request: Request = new Request('../generators/pdf/index.php', {
+        method: 'POST',
+        body: formData,
+        headers: new Headers(),
+      });
 
-        fetch(`https://localhost/generators/data/${directory}/${userId}/kid-photo.png`).then((response: Response) => {
+      fetch(`${document.location.origin}/generators/data/${directory}/${userId}/kid-photo.png`).then(
+        (response: Response) => {
           if (response.status === 200) {
             fetch(request)
               .then((resp: Response) => {
@@ -142,8 +180,9 @@ class UploadFile {
                 throw new Error(error);
               });
           }
-        });
-      };
+        }
+      );
+    };
 
     const generateJSON: () => void = async () => {
       updateStatus('.status', 'Wczytuję plik...');
@@ -163,7 +202,6 @@ class UploadFile {
 
           workbook.SheetNames.forEach((sheet: string) => {
             rowObject = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
-
             serialRange = `${rowObject[0]['Serial number']}-${rowObject[rowObject.length - 1]['Serial number']}`;
 
             mkdir(serialRange);
@@ -176,19 +214,28 @@ class UploadFile {
             updateStatus('.status', 'Zapisuję...');
 
             wait(5000)
-              .then(() => {
-                document.getElementById('jsondata').innerHTML = JSON.stringify(rowObject, undefined, 4);
-              })
+              // .then(() => {
+              //   document.getElementById('jsondata').innerHTML = JSON.stringify(rowObject, undefined, 4);
+              // })
               .then(() => {
                 updateStatus('.status', 'Generuję pliki PDF...');
               })
               .then(() => {
                 rowObject.forEach((obj: RowObject) => {
-                  generatePDF(serialRange, obj['Serial number'], obj['User Id'], obj.Label, obj.Photo);
+                  generatePDF(serialRange, obj['Serial number'], obj['User Id'], obj.Label);
                 });
               })
               .then(() => {
                 updateStatus('.status', 'Gotowe!');
+              })
+              .then(() => {
+                if (!button || !filenameSpan) {
+                  return;
+                }
+
+                button.disabled = true;
+                filenameSpan.textContent = '';
+                filenameSpan.parentElement.className = 'hidden';
               });
           });
         };
