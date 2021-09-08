@@ -158,6 +158,11 @@ const purgeCSS = new PurgecssPlugin({
     'footer',
     'footer__top',
     'footer__bottom',
+    'border-blue-400',
+    'bg-gray-100',
+    'hover:bg-gray-100',
+    'hover:border-blue-400',
+    'transition-all',
   ],
 });
 

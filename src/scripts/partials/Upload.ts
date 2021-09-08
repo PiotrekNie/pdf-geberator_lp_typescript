@@ -26,12 +26,12 @@ class UploadFile {
 
       if (ev.type === 'dragleave') {
         inputContainer.className =
-          'relative h-40 rounded-lg border-dashed border-2 border-gray-200 bg-white flex justify-center items-center hover:cursor-pointer';
+          'relative h-40 rounded-lg border-dashed border-2 border-gray-200 bg-white flex justify-center items-center hover:bg-gray-100 hover:border-blue-400 transition-all hover:cursor-pointer';
         return;
       }
 
       inputContainer.className =
-        'relative h-40 rounded-lg border-dashed border-2 border-blue-400 bg-gray-100 flex justify-center items-center hover:cursor-pointer';
+        'relative h-40 rounded-lg border-dashed border-2 border-blue-400 bg-gray-100 flex justify-center items-center hover:bg-gray-100 hover:border-blue-400 transition-all hover:cursor-pointer';
     };
 
     document.getElementById(this.inputId).addEventListener('change', (ev: Event) => {
@@ -167,21 +167,19 @@ class UploadFile {
         headers: new Headers(),
       });
 
-      fetch(`${document.location.origin}/generators/data/${directory}/${userId}/kid-photo.png`).then(
-        (response: Response) => {
-          if (response.status === 200) {
-            fetch(request)
-              .then((resp: Response) => {
-                if (resp.status === 200) {
-                  // console.log(resp);
-                }
-              })
-              .catch((error: string) => {
-                throw new Error(error);
-              });
-          }
+      fetch(`../generators/data/${directory}/${userId}/kid-photo.png`).then((response: Response) => {
+        if (response.status === 200) {
+          fetch(request)
+            .then((resp: Response) => {
+              if (resp.status === 200) {
+                // console.log(resp);
+              }
+            })
+            .catch((error: string) => {
+              throw new Error(error);
+            });
         }
-      );
+      });
     };
 
     const generateJSON: () => void = async () => {
