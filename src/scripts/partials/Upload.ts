@@ -203,13 +203,13 @@ class UploadFile {
 
           workbook.SheetNames.forEach((sheet: string) => {
             rowObject = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
-            serialRange = `${rowObject[0]['Serial number']}-${rowObject[rowObject.length - 1]['Serial number']}`;
+            serialRange = `${rowObject[0]['Submission ID']}-${rowObject[rowObject.length - 1]['Submission ID']}`;
 
             mkdir(serialRange);
             wait(300);
 
             rowObject.forEach((obj: RowObject) => {
-              uploadFile(obj['Serial number'], obj.Photo, 'kid-photo', serialRange);
+              uploadFile(obj['Submission ID'], obj.Photo, 'kid-photo', serialRange);
             });
 
             updateStatus('.status', 'Zapisuję...');
@@ -223,7 +223,7 @@ class UploadFile {
               })
               .then(() => {
                 rowObject.forEach((obj: RowObject) => {
-                  generatePDF(serialRange, obj['Serial number'], obj['User Id'], obj.Label);
+                  generatePDF(serialRange, obj['Submission ID'], obj['User Id'], obj.Label);
                 });
               })
               .then(() => {
