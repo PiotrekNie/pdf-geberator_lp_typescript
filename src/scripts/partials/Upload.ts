@@ -36,6 +36,7 @@ class UploadFile {
 
     document.getElementById(this.inputId).addEventListener('change', (ev: Event) => {
       selectedFile = (<HTMLInputElement>ev.target).files;
+      const inputContainer: HTMLElement = (<HTMLInputElement>ev.target).parentElement;
 
       if (!button || !filenameSpan) {
         return;
@@ -45,6 +46,8 @@ class UploadFile {
         button.disabled = false;
         filenameSpan.textContent = selectedFile[0].name;
         filenameSpan.parentElement.className = 'button';
+        inputContainer.className =
+          'relative h-40 rounded-lg border-dashed border-2 border-gray-200 bg-white flex justify-center items-center hover:bg-gray-100 hover:border-blue-400 transition-all hover:cursor-pointer';
       }
     });
 
